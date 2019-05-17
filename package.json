@@ -1,0 +1,27 @@
+{
+  "name": "yelpcamp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaopbarberino/YelpCamp.git"
+  },
+  "author": "Joao Pedro Barberino",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaopbarberino/YelpCamp/issues"
+  },
+  "homepage": "https://github.com/joaopbarberino/YelpCamp#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "nodemon": "^1.19.0",
+    "package.json": "^2.0.1"
+  }
+}

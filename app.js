@@ -5,7 +5,7 @@ const express = require("express"),
 	mongoose = require("mongoose");
 
 // Conecta o banco de dados à app
-mongoose.connect("mongodb://localhost/YelpCamp", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost:27017/YelpCamp", { useNewUrlParser: true });
 // Permite a app lidar com as URL's
 app.use(bodyParser.urlencoded({ extended: true }));
 // Define a engine de renderização como arquivos ejs nas pasta view
@@ -14,10 +14,12 @@ app.set("view engine", "ejs");
 // Cria um esquema para definir um objeto acampamento no banco de dados
 const campSchema = new mongoose.Schema({
 	name: String,
-	imgURL: String
+	imgURL: String,
+	description: String,
 }),
-	// Cria um objeto capaz de manipular o banco de dados a partir do esquema
+	// Cria um objeto capaz de manipular a coleção criada no db a partir do esquema
 	Camp = mongoose.model("Camp", campSchema);
+
 
 // Quando a URL path for solicitada
 app.get("/", (req, res) => {
@@ -51,7 +53,8 @@ app.post("/campgrounds", (req, res) => {
 	// Guarda os dados recebidos da requisição
 	let name = req.body.name,
 		imgURL = req.body.image,
-		newCampground = { name: name, imgURL: imgURL };
+		desc = req.body.desc,
+		newCampground = { name: name, imgURL: imgURL, description: desc};
 	// Cria um objeto no banco de dados com os dados recebidos
 	Camp.create(newCampground, (err, camp) => {
 		// Verifica se houve erro
@@ -63,6 +66,22 @@ app.post("/campgrounds", (req, res) => {
 			console.log("Camp adicionado.");
 			console.log(camp);
 			res.redirect("/campgrounds")
+		}
+	});
+});
+
+// Quando uma requisição é feita a url /campgrounds/ <id do camp selecionado>
+app.get("/campgrounds/:id", (req, res) => {
+
+	Camp.findById(req.params.id, (err, campEscolhido) => {
+		// Verifica se houve erro
+		if (err) {
+			console.log("ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO!")
+			console.log(err)
+			// Se não houve erro, renderiza a página de exibição do camp escolhido
+		} else {
+			// Renderiza a página de informações do camp selecionado
+			res.render("show", {campground: campEscolhido});
 		}
 	});
 });

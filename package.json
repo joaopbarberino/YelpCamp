@@ -21,6 +21,8 @@
     "body-parser": "^1.19.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "mongodb": "^3.2.4",
+    "mongoose": "^5.5.9",
     "nodemon": "^1.19.0",
     "package.json": "^2.0.1"
   }

@@ -4,4 +4,11 @@
 <img class="img-fluid" src="<%= campground.imgURL %>">
 <p><%= campground.description %></p>
 
+<h3>Comentários</h3>
+<% campground.comments.forEach((comment) => { %>
+    <p>
+        <strong> <%= comment.author %> </strong> - <%= comment.text %>
+    </p>
+<% }) %>
+
 <% include partials/footer %>

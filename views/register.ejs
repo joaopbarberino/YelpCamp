@@ -1,0 +1,23 @@
+<% include partials/header %>
+
+<div class="container d-flex justify-content-center">
+		<form action="/campgrounds" method="POST" class="mt-5 vw-50">
+			<h1 class="mb-5"> Registrar Novo Usuário </h1>
+			<div class="form-group row">
+				<label class="col-md-2 col-form-label">Usuário</label>
+				<div class="col-md-10">
+					<input required class="form-control" type="username" name="comment[author]" placeholder="Insira o nome de usuário desejado">
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-md-2 col-form-label">Senha</label>
+				<div class="col-md-10">
+					<input required class="form-control" type="password" name="comment[text]" placeholder="Insira uma senha">
+				</div>
+			</div>
+			<button class="btn btn-block btn-success p-3"> Registrar </button>
+		</form>
+	
+</div>
+
+<% include partials/footer %>

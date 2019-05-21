@@ -1,0 +1,27 @@
+<% include ../partials/header %>
+
+<div class="container">
+	<header class="jumbotron mt-4">
+		<div class="container">
+			<h1 class="display-4">Bem-Vindo!!!</h1>
+			<p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a gravida metus, eget volutpat tellus. Nulla facilisi. Pellentesque sit amet libero ac ex dictum placerat nec eget arcu. Pellentesque nec urna nisl. Morbi feugiat ullamcorper arcu, eu tristique lectus convallis et. </p>
+			<hr class="my-4">
+			<a class="btn btn-success w-100" href="/campgrounds/new">Adicionar Campground</a>
+		</div>
+	</header>
+
+	<div class="row d-flex flex-wrap text-center">
+		<% campgrounds.forEach((campground)=>{ %>
+		<div class="col-12 col-md-6 col-lg-4 mb-4">
+			<div class="card p-0 m-1">
+				<img class="img-fluid" src="<%= campground.imgURL %>">
+				<div class="card-body">
+					<h5 class="card-title"><%= campground.name %></h5>
+					<a href="campgrounds/<%= campground._id %>" class="btn w-100 btn-info">Informações</a>
+				</div>
+			</div>
+		</div>
+		<% })%>
+	</div>
+</div>
+<% include ../partials/footer %>

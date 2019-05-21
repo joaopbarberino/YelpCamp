@@ -2,7 +2,14 @@
 const express = require("express"),
 	app = express(),
 	bodyParser = require("body-parser"),
-	mongoose = require("mongoose");
+	mongoose = require("mongoose"),
+	passport = require("passport"),
+	LocalStrategy = require("passport-local");
+
+// Importa as models utilizadas no projeto
+const Camp = require("./models/campground"),
+	Comment = require("./models/comment"),
+	User = require("./models/user");
 
 // Conecta o banco de dados à app
 mongoose.connect("mongodb://localhost/YelpCamp", { useNewUrlParser: true });
@@ -11,9 +18,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Define a engine de renderização como arquivos ejs nas pasta view
 app.set("view engine", "ejs");
 
-// Importa as models utilizadas no projeto
-const Camp = require("./models/campground"),
-	Comment = require("./models/comment");
+// Configuração Passport
+app.use(require("express-session")({
+	secret: "segredo",
+	resave: false,
+	saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 
 
 // Teste criação de acampamento com comentario
@@ -42,8 +58,8 @@ const Camp = require("./models/campground"),
 // 		}
 // 	});
 
-
 // ------------------------------------------------- Routes -----------------------------------------------------
+// ---------------------------------------------- Camps Routes --------------------------------------------------
 
 // Path Route
 // Quando a URL path for solicitada
@@ -63,16 +79,16 @@ app.get("/campgrounds", (req, res) => {
 			console.log(err);
 			// Se não houve erro, renderiza a página de campgrounds com os dados coletados
 		} else {
-			res.render("campgrounds", { campgrounds: camps });
+			res.render("campgrounds/campgrounds", { campgrounds: camps });
 		}
 	});
 });
 
-// Create Route
+// New Route
 // Quando a URL /campgrounds/new for solicitada (adição de novo acampamento)
 app.get("/campgrounds/new", (req, res) => {
 	// Renderiza a página de formulário
-	res.render("new.ejs");
+	res.render("campgrounds/new.ejs");
 });
 
 // Create Route
@@ -110,10 +126,83 @@ app.get("/campgrounds/:id", (req, res) => {
 			// Se não houve erro, renderiza a página de exibição do camp escolhido
 		} else {
 			// Renderiza a página de informações do camp selecionado
-			res.render("show", { campground: campEscolhido });
+			res.render("campgrounds/show", { campground: campEscolhido });
 		}
 	});
 });
+
+// --------------------------------------------- Comments Routes ------------------------------------------------
+
+// New Route
+app.get("/campgrounds/:id/comments/new", (req, res) => {
+	Camp.findById(req.params.id, (err, campground) => {
+		if (err) {
+			console.log(`ERRO AO ENCONTRAR ACAMPAMENTO: ${err}`);
+		} else {
+			res.render("comments/new", { campground: campground });
+		}
+	});
+});
+
+// Create Route
+app.post("/campgrounds/:id/comments", (req, res) => {
+	Camp.findById(req.params.id, (err, campground) => {
+		if (err) {
+			console.log(`ERRO AO ENCONTRAR ACAMPAMENTO: ${err}`);
+		} else {
+			Comment.create({
+				author: req.body.comment.author,
+				text: req.body.comment.text
+			}, (err, comment) => {
+				if (err) {
+					console.log(`ERRO AO CRIAR COMENTÁRIO ${err}`);
+				} else {
+					console.log(`Comentário criado: ${comment} no camp ${campground}`);
+					campground.comments.push(comment);
+					campground.save();
+					console.log(campground.comments)
+					res.redirect(`/campgrounds/${req.params.id}`);
+				};
+			});
+		};
+	});
+});
+
+// --------------------------------------------- Auth Routes ------------------------------------------------
+
+// Register form
+app.get("/register", (req, res) => {
+	res.render("register");
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Quando qualquer URL não reconhecida for solicitada 
 app.get("*", (req, res) => {
@@ -121,5 +210,5 @@ app.get("*", (req, res) => {
 	res.send("Essa página não existe.")
 });
 
-// Dá uma porta para o servidor Node rodar
+// Dá uma porta local para o servidor Node rodar
 app.listen(3000, () => console.log("Server iniciado."));

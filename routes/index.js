@@ -44,6 +44,11 @@ router.post("/login", passport.authenticate("local",
 		successRedirect: "/campgrounds",
 		failureRedirect: "/login"
 	}), (req, res) => {
+		if(err){
+			console.log(err)
+		} else {
+			res.redirect("/campgrounds");
+		}
 	});
 
 
@@ -63,6 +68,15 @@ function isLogged(req, res, next) {
 		return next();
 	}
 	res.redirect("/warning");
+}
+
+function isntLogged(req, res, next) {
+    if (req.isAuthenticated()) {
+		console.log("ACHOU USUARIO");
+		return res.redirect("/warning");
+	}
+	console.log("NAO ACHOU USUARIO");
+	return next();
 }
 
 module.exports = router;

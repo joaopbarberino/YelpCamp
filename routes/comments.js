@@ -33,6 +33,10 @@ router.post("/", isLogged, (req, res) => {
                 if (err) {
                     console.log(`ERRO AO CRIAR COMENTÁRIO ${err}`);
                 } else {
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
+                    console.log(comment);
                     campground.comments.push(comment);
                     campground.save();
                     res.redirect(`/campgrounds/${req.params.id}`);

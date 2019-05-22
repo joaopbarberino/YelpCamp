@@ -1,7 +1,13 @@
 const mongoose = require("mongoose"),
     commentSchema = new mongoose.Schema(
         {
-            author: String,
+            author: {
+                id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User"
+                },
+                username: String
+            },
             text: String            
         }
     );

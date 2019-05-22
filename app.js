@@ -5,6 +5,7 @@ const express = require("express"),
 	mongoose = require("mongoose"),
 	passport = require("passport"),
 	LocalStrategy = require("passport-local");
+	methodOverride = require("method-override");
 
 // Importa as models utilizadas no projeto
 const Camp = require("./models/campground"),
@@ -22,6 +23,11 @@ mongoose.connect("mongodb://localhost/YelpCamp", { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({ extended: true }));
 // Define a engine de renderização como arquivos ejs nas pasta view
 app.set("view engine", "ejs");
+// Diz à app onde encontrar arquivos custom de js e css
+app.use(express.static(__dirname + "/public"));
+// Permite criar novos tipos de rotas, como update, delete, etc
+app.use(methodOverride("_method"));
+
 
 // Configuração Passport
 app.use(require("express-session")({

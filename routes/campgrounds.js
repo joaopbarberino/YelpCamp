@@ -2,7 +2,8 @@ const express = require("express"),
     router = express.Router();
 
 // Importa as models utilizadas no projeto
-const Camp = require("../models/campground");
+const Camp = require("../models/campground"),
+    Comment = require("../models/comment");
 
 // ---------------------------------------------- Camps Routes --------------------------------------------------
 
@@ -36,7 +37,11 @@ router.post("/", isLogged, (req, res) => {
     let name = req.body.name,
         imgURL = req.body.image,
         desc = req.body.desc,
-        newCampground = { name: name, imgURL: imgURL, description: desc };
+        author = {
+            id: req.user._id,
+            username: req.user.username
+        }
+    newCampground = { name: name, imgURL: imgURL, description: desc, author: author };
     // Cria um objeto no banco de dados com os dados recebidos
     Camp.create(newCampground, (err, camp) => {
         // Verifica se houve erro
@@ -58,8 +63,7 @@ router.get("/:id", (req, res) => {
     Camp.findById(req.params.id).populate("comments").exec((err, campEscolhido) => {
         // Verifica se houve erro
         if (err) {
-            console.log("ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO!")
-            console.log(err)
+            console.log("ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO!");
             // Se não houve erro, renderiza a página de exibição do camp escolhido
         } else {
             // Renderiza a página de informações do camp selecionado
@@ -67,6 +71,61 @@ router.get("/:id", (req, res) => {
         }
     });
 });
+
+// Edit Route
+router.get("/:id/edit", isTheOwner, (req, res) => {
+    Camp.findById(req.params.id, (err, campEscolhido) => {
+        res.render("campgrounds/edit", { campground: campEscolhido });
+    });
+});
+
+// Update Route
+router.put("/:id", (req, res) => {
+
+    Camp.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCamp) => {
+        if (err) {
+            res.redirect("/campgrounds");
+        } else {
+            res.redirect("/campgrounds/" + req.params.id);
+        }
+    });
+});
+
+// Destroy Route
+router.delete("/:id", (req, res) => {
+    Camp.findByIdAndRemove(req.params.id, (err, campgroundRemoved) => {
+        if (err) {
+            console.log(`ERRO AO DELETAR CAMP ${err}`);
+            res.redirect("/campgrounds");
+        } else {
+            Comment.deleteMany({ _id: { $in: campgroundRemoved.comments } }, (err) => {
+                if (err) {
+                    console.log(`ERRO AO DELETAR COMENTARIO DE CAMPO DELETADO: ${err}`);
+                    res.redirect("/campgrounds");
+                } else {
+                    res.redirect("/campgrounds");
+                }
+            });
+        }
+    });
+});
+
+function isTheOwner(req, res, next) {
+    if (req.isAuthenticated()) {
+        Camp.findById(req.params.id, (err, foundCampground) => {
+            if (err) {
+                console.log(`ERRO AO ENCONTRAR CAMP APÓS CONFIRMAR MIDDLEWARE DE IDENTIDADE ${err}`);
+                res.redirect("back");
+            } else {
+                if (foundCampground.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+            }
+        });
+    }
+}
 
 function isLogged(req, res, next) {
     if (req.isAuthenticated()) {

@@ -1,0 +1,78 @@
+const express = require("express"),
+    router = express.Router();
+
+// Importa as models utilizadas no projeto
+const Camp = require("../models/campground");
+
+// ---------------------------------------------- Camps Routes --------------------------------------------------
+
+// Index Route
+// Quando a URL /campgrounds for solicitada
+router.get("/", (req, res) => {
+    // Pega todos os camps do banco de dados
+    Camp.find({}, (err, camps) => {
+        // Verifica se houve erro
+        if (err) {
+            console.log("ERRO AO COLETAR CAMPS!")
+            console.log(err);
+            // Se não houve erro, renderiza a página de campgrounds com os dados coletados
+        } else {
+            res.render("campgrounds/campgrounds", { campgrounds: camps });
+        }
+    });
+});
+
+// New Route
+// Quando a URL /campgrounds/new for solicitada (adição de novo acampamento)
+router.get("/new", isLogged, (req, res) => {
+    // Renderiza a página de formulário
+    res.render("campgrounds/new.ejs");
+});
+
+// Create Route
+// Quando uma requisição POST for feita à URL /campgrounds, no caso, vinda de um form 
+router.post("/", isLogged, (req, res) => {
+    // Guarda os dados recebidos da requisição
+    let name = req.body.name,
+        imgURL = req.body.image,
+        desc = req.body.desc,
+        newCampground = { name: name, imgURL: imgURL, description: desc };
+    // Cria um objeto no banco de dados com os dados recebidos
+    Camp.create(newCampground, (err, camp) => {
+        // Verifica se houve erro
+        if (err) {
+            console.log("ERRO AO SALVAR CAMP!");
+            console.log(err);
+            // Se não houve erro, redireciona o usuário a página de campgrounds
+        } else {
+            console.log("Camp adicionado.");
+            console.log(camp);
+            res.redirect("/campgrounds")
+        }
+    });
+});
+
+// Show Route
+// Quando uma requisição é feita a url /campgrounds/ <id do camp selecionado>
+router.get("/:id", (req, res) => {
+    Camp.findById(req.params.id).populate("comments").exec((err, campEscolhido) => {
+        // Verifica se houve erro
+        if (err) {
+            console.log("ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO!")
+            console.log(err)
+            // Se não houve erro, renderiza a página de exibição do camp escolhido
+        } else {
+            // Renderiza a página de informações do camp selecionado
+            res.render("campgrounds/show", { campground: campEscolhido });
+        }
+    });
+});
+
+function isLogged(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/warning");
+}
+
+module.exports = router;

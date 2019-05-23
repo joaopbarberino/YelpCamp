@@ -28,17 +28,17 @@
                         <p><%= campground.description %></p>
                         <p class="font-italic">Enviado por <span
                                 class="text-info"><%= campground.author.username %></span>.</p>
-                        <% if(currentUser) {%>
-                            <% if(currentUser.username == campground.author.username){ %>
+
+                        <% if(currentUser && currentUser.username == campground.author.username){ %>
                         <a href="/campgrounds/<%=campground._id%>/edit"
-                            class="btn btn-block btn-outline-warning mb-2">Editar</a>
+                            class=""><i
+                            class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
                         <form action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
-                            <button href=""
-                            class="btn btn-block btn-outline-danger mb-2">Deletar</button>
-                        
+                            <button href="" class="btn btn-block btn-outline-danger mb-2"><i
+                                class="fas fa-eraser"></i></button>
                         </form>
-                            <% } %>
                         <% } %>
+
                     </div>
                     <div class="d-flex">
                         <p class="card-text text-danger mr-auto">PLACEHOLDER</p>
@@ -56,25 +56,43 @@
             <!------------------------------------------COMENTÁRIOS------------------------------------------------->
 
             <div class="card bg-light mt-2">
-                <a href="/campgrounds/<%= campground._id %>/comments/new" class="btn m-2 mb-0 btn-success">Adicionar
-                    Novo
-                    Comentário</a>
+                <a href="/campgrounds/<%= campground._id %>/comments/new" class="btn m-2 mb-0 btn-success"> Comentar <i class="fas fa-comment-dots ml-1"></i></a>
                 <hr class="mt-1">
                 <div class="card-body">
-                    <h3 class="text-center mb-5">Comentários</h1>
+                    <h3 class="text-center mb-5">Comentários <i class="fas fa-comments ml-1"></i></h1>
                         <% if(campground.comments.length == 0) { %>
                         <hr>
                         <p class="card-text text-center">Ainda não há comentários! Faça um!</p>
                         <% } else { %>
                         <%    campground.comments.forEach((comment) => { %>
                         <hr>
-                        <div class="d-flex">
-                            <p class="card-title mr-auto"><%= comment.author.username %></p>
-                            <p class="card-title">10 dias atrás</p>
+                        <div class="row">
+                            <div class="col-8 col-lg-10">
+                                <p class="card-title mr-auto"><%= comment.author.username %></p>
+                                <p class="card-text">
+                                    <%= comment.text %>
+                                </p>
+
+                            </div>
+                            <div class="col-4 col-lg-2">
+                                <p class="card-title">10 dias atrás</p>
+
+                                <% if(currentUser && currentUser.username == comment.author.username){ %>
+                                <a href="/campgrounds/<%=campground._id%>/comments/<%= comment._id %>/edit" class=""><i
+                                        class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
+                                <form
+                                    action="/campgrounds/<%=campground._id%>/comments/<%= comment._id %>?_method=DELETE"
+                                    method="POST">
+                                    <button href="" class="btn btn-block btn-outline-danger mb-2"><i
+                                            class="fas fa-eraser"></i></button>
+                                </form>
+                                <% } %>
+
+
+                            </div>
                         </div>
-                        <p class="card-text">
-                            <%= comment.text %>
-                        </p>
+
+
                         <% }) %>
                         <% } %>
                 </div>

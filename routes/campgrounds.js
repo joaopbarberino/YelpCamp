@@ -1,5 +1,6 @@
 const express = require("express"),
-    router = express.Router();
+    router = express.Router(),
+    middlewares = require("../middleware");
 
 // Importa as models utilizadas no projeto
 const Camp = require("../models/campground"),
@@ -25,14 +26,14 @@ router.get("/", (req, res) => {
 
 // New Route
 // Quando a URL /campgrounds/new for solicitada (adição de novo acampamento)
-router.get("/new", isLogged, (req, res) => {
+router.get("/new", middlewares.isLogged, (req, res) => {
     // Renderiza a página de formulário
     res.render("campgrounds/new.ejs");
 });
 
 // Create Route
 // Quando uma requisição POST for feita à URL /campgrounds, no caso, vinda de um form 
-router.post("/", isLogged, (req, res) => {
+router.post("/", middlewares.isLogged, (req, res) => {
     // Guarda os dados recebidos da requisição
     let name = req.body.name,
         imgURL = req.body.image,
@@ -62,26 +63,26 @@ router.post("/", isLogged, (req, res) => {
 router.get("/:id", (req, res) => {
     Camp.findById(req.params.id).populate("comments").exec((err, campEscolhido) => {
         // Verifica se houve erro
-        if (err) {
-            console.log("ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO!");
+        //if (err) {
+            //console.log(`ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO: ${err}`);
+           
             // Se não houve erro, renderiza a página de exibição do camp escolhido
-        } else {
+        //} else {
             // Renderiza a página de informações do camp selecionado
             res.render("campgrounds/show", { campground: campEscolhido });
-        }
+        //}
     });
 });
 
 // Edit Route
-router.get("/:id/edit", isTheOwner, (req, res) => {
+router.get("/:id/edit", middlewares.isTheCampOwner, (req, res) => {
     Camp.findById(req.params.id, (err, campEscolhido) => {
         res.render("campgrounds/edit", { campground: campEscolhido });
     });
 });
 
 // Update Route
-router.put("/:id", (req, res) => {
-
+router.put("/:id", middlewares.isTheCampOwner, (req, res) => {
     Camp.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCamp) => {
         if (err) {
             res.redirect("/campgrounds");
@@ -92,7 +93,7 @@ router.put("/:id", (req, res) => {
 });
 
 // Destroy Route
-router.delete("/:id", (req, res) => {
+router.delete("/:id", middlewares.isTheCampOwner, (req, res) => {
     Camp.findByIdAndRemove(req.params.id, (err, campgroundRemoved) => {
         if (err) {
             console.log(`ERRO AO DELETAR CAMP ${err}`);
@@ -109,29 +110,5 @@ router.delete("/:id", (req, res) => {
         }
     });
 });
-
-function isTheOwner(req, res, next) {
-    if (req.isAuthenticated()) {
-        Camp.findById(req.params.id, (err, foundCampground) => {
-            if (err) {
-                console.log(`ERRO AO ENCONTRAR CAMP APÓS CONFIRMAR MIDDLEWARE DE IDENTIDADE ${err}`);
-                res.redirect("back");
-            } else {
-                if (foundCampground.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-            }
-        });
-    }
-}
-
-function isLogged(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/warning");
-}
 
 module.exports = router;

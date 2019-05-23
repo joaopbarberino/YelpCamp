@@ -16,6 +16,8 @@
 	<script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 		crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 	<title>YelpCamp</title>
 </head>
 
@@ -24,7 +26,8 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<a class="navbar-brand" href="/">YelpCamp</a>
 		<% if (currentUser) { %>
-			<a class="navbar-brand text-white"><span class="mr-3 d-none d-lg-inline">|</span>Olá, <span class="text-info"><%= currentUser.username %></span></a>
+		<a class="navbar-brand text-white"><span class="mr-3 d-none d-lg-inline">|</span>Olá, <span
+				class="text-info"><%= currentUser.username %></span></a>
 		<% } %>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
 			aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">

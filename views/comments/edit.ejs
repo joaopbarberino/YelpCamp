@@ -1,0 +1,18 @@
+<% include ../partials/header %>
+
+<div class="container d-flex justify-content-center">
+    <form action="/campgrounds/<%= campground_id %>/comments/<%= comment._id %>?_method=PUT" method="POST"
+        class="mt-5 w-50">
+        <h1 class="mb-5">Editar comentário</h1>
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label">Comentário</label>
+            <div class="col-md-10">
+                <textarea required class="form-control" type="textarea" name="comment[text]"><%= comment.text %></textarea>
+            </div>
+        </div>
+        <button class="btn btn-block btn-success p-3"> Enviar </button>
+        <a class="btn btn-primary mt-1" href="">Voltar</a>
+    </form>
+</div>
+
+<% include ../partials/footer %>

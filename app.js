@@ -67,5 +67,7 @@ app.get("*", (req, res) => {
 	res.send("Essa página não existe.")
 });
 
+var port = process.env.PORT || 3000;
+var ip = process.env.IP || 'localhost';
 // Dá uma porta local para o servidor Node rodar
-app.listen(3000, () => console.log("Server iniciado."));
+app.listen(port, ip, () => console.log("Server iniciado."));

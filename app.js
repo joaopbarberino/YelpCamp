@@ -19,7 +19,8 @@ const commentRoutes = require("./routes/comments"),
 	indexRoutes = require("./routes/index");
 
 // Conecta o banco de dados à app
-mongoose.connect("mongodb://localhost/YelpCamp", { useNewUrlParser: true });
+//mongoose.connect("mongodb://localhost/YelpCamp", { useNewUrlParser: true });
+mongoose.connect("mongodb+srv://dbUser:123@cluster0-ot0ug.mongodb.net/test?retryWrites=true", {useNewUrlParser: true});
 // Permite a app lidar com as URL's
 app.use(bodyParser.urlencoded({ extended: true }));
 // Define a engine de renderização como arquivos ejs nas pasta view

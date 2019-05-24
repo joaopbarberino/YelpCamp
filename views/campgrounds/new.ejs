@@ -5,25 +5,32 @@
 		<form action="/campgrounds" method="POST" class="mt-5 w-50">
 			<h1 class="mb-5">Criar Novo Acampamento</h1>
 			<div class="form-group row">
-				<label class="col-md-2 col-form-label">Nome</label>
-				<div class="col-md-10">
-					<input required class="form-control" type="text" name="name" placeholder="Nome">
+				<label class="col-xl-2 col-form-label">Nome</label>
+				<div class="col-xl-10">
+					<input required class="form-control" type="text" name="name" placeholder="Insira o nome do acampamento">
 				</div>
 			</div>
 			<div class="form-group row">
-				<label class="col-md-2 col-form-label">Descrição</label>
-				<div class="col-md-10">
-					<textarea required class="form-control" type="textarea" name="desc" placeholder="Descrição"></textarea>
+				<label class="col-xl-2 col-form-label">Descrição</label>
+				<div class="col-xl-10">
+					<textarea required class="form-control" type="textarea" name="desc" placeholder="Descreva o acampamento"></textarea>
 				</div>
 			</div>
 			<div class="form-group row">
-				<label for="image" class="col-md-2 col-form-label">URL da Imagem</label>
-				<div class="col-md-10">
-					<input required class="form-control" type="text" name="image" placeholder="URL da Imagem">
+				<label class="col-xl-2 col-form-label">Preço(R$) por noite</label>
+				<div class="col-xl-10">
+					<input required class="form-control" type="number" name="price" min="0.00" step="0.10"placeholder="Insira o preço do acampamento por noite">
 				</div>
 			</div>
-			<button class="btn btn-block btn-success p-3"> Enviar </button>
-			<a class="btn btn-primary mt-1" href="/campgrounds">Voltar</a>
+			<div class="form-group row">
+				<label for="image" class="col-xl-2 col-form-label">URL da Imagem</label>
+				<div class="col-xl-10">
+					<input required class="form-control" type="text" name="image" placeholder="Insira um link de uma imagem do acampamento">
+				</div>
+			</div>
+			<button class="btn btn-block btn-success p-3"> <i
+				class="fas fa-check"></i> </button>
+			<a class="btn btn-primary mt-1" href="/campgrounds"><i class="fas fa-chevron-left"></i></a>
 		</form>
 	
 </div>

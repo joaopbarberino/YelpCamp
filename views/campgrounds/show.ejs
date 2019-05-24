@@ -5,12 +5,12 @@
 <%      cont ++; %>
 <% }) %>
 
-<div class="container">
+<main role="main" class="container pb-5">
     <div class="row">
         <div class="col-md-3 mt-2">
             <p class="lead">YelpCamp</p>
             <div class="list-group">
-                <a href="/campgrounds" class="mb-2 btn btn-outline-primary">Voltar</a>
+                <a href="/campgrounds" class="mb-2 btn btn-outline-primary"><i class="fas fa-chevron-left"></i></a>
                 <div class="list-group-item active">Category 1</div>
                 <div class="list-group-item">Category 2</div>
                 <div class="list-group-item">Category 3</div>
@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <div class="d-flex">
                         <h4 class="card-title mr-auto"><a href="#"><%= campground.name %></a></h4>
-                        <h5 class="card-title">$9.00/night</h5>
+                        <h5 class="card-title">R$ <%= campground.price %>/noite</h5>
                     </div>
                     <div class="card-text">
                         <p><%= campground.description %></p>
@@ -30,25 +30,21 @@
                                 class="text-info"><%= campground.author.username %></span>.</p>
 
                         <% if(currentUser && currentUser.username == campground.author.username){ %>
-                        <a href="/campgrounds/<%=campground._id%>/edit"
-                            class=""><i
-                            class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
+                        <a href="/campgrounds/<%=campground._id%>/edit" class=""><i
+                                class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
                         <form action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
                             <button href="" class="btn btn-block btn-outline-danger mb-2"><i
-                                class="fas fa-eraser"></i></button>
+                                    class="fas fa-eraser"></i></button>
                         </form>
                         <% } %>
 
                     </div>
                     <div class="d-flex">
-                        <p class="card-text text-danger mr-auto">PLACEHOLDER</p>
-                        <% if (cont == 0){ %>
-                        <p class="card-text text-danger"> Nenhum review</p>
-                        <% } else if (cont == 1) { %>
-                        <p class="card-text text-danger"> 1 review</p>
-                        <% } else { %>
-                        <p class="card-text text-danger"> <%= cont %> reviews</p>
-                        <% } %>
+                        <!-- TODO nota do acampamento -->
+                        <!-- <p class="card-text text-danger mr-auto">PLACEHOLDER</p> -->
+
+                        <p class="card-text ml-auto text-danger"> <%= cont %> <i class="fas fa-comment"></i></p>
+
                     </div>
                 </div>
             </div>
@@ -56,7 +52,26 @@
             <!------------------------------------------COMENTÁRIOS------------------------------------------------->
 
             <div class="card bg-light mt-2">
-                <a href="/campgrounds/<%= campground._id %>/comments/new" class="btn m-2 mb-0 btn-success"> Comentar <i class="fas fa-comment-dots ml-1"></i></a>
+                <!-- <a href="/campgrounds/<%= campground._id %>/comments/new" class="btn m-2 mb-0 btn-success"> Comentar <i
+                        class="fas fa-comment-dots ml-1"></i></a> -->
+                <div class="p-1 d-flex justify-content-center">
+                    <form action="/campgrounds/<%= campground._id %>/comments" method="POST" class="mt-5 w-50">
+                        <h3 class="mb-3 text-center"> Comentar <i class="fas fa-comment-dots ml-1"></i> </h3>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <input readonly hidden class="form-control-plaintext" type="text" name="comment[author]"
+                                    value="<%= currentUser %>">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <textarea required class="form-control" type="textarea" name="comment[text]"
+                                    placeholder="Comentário"></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-block btn-success p-3 mb-4"> <i class="fas fa-check"></i> </button>
+                    </form>
+                </div>
                 <hr class="mt-1">
                 <div class="card-body">
                     <h3 class="text-center mb-5">Comentários <i class="fas fa-comments ml-1"></i></h1>
@@ -64,31 +79,58 @@
                         <hr>
                         <p class="card-text text-center">Ainda não há comentários! Faça um!</p>
                         <% } else { %>
-                        <%    campground.comments.forEach((comment) => { %>
+                            <!--------------------------------------LOOP-------------------------------------->
+                        <% campground.comments.forEach((comment) => { %>
                         <hr>
-                        <div class="row">
-                            <div class="col-8 col-lg-10">
+                        <div>
+                            <!-- FORM EDITAR COMENTARIO -->
+
+                            <div class="justify-content-center d-none editar_comentario" id="">
                                 <p class="card-title mr-auto"><%= comment.author.username %></p>
-                                <p class="card-text">
-                                    <%= comment.text %>
-                                </p>
+                                <form
+                                    action="/campgrounds/<%= campground._id %>/comments/<%= comment._id %>?_method=PUT"
+                                    method="POST" class="mt-3 ml-0 w-100 inline-form">
+                                    <div class="form-group row">
+                                        <div class="col-md-10">
+                                            <textarea required class="form-control" type="textarea"
+                                                name="comment[text]"><%= comment.text %></textarea>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-block btn-success w-100 mb-2"> <i
+                                                    class="fas fa-check"></i> </button>
+                                            <button type="button" class="btn btn-bloc btn-danger w-100 botoes_cancel"><i
+                                                    class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </form>
+
 
                             </div>
-                            <div class="col-4 col-lg-2">
-                                <p class="card-title">10 dias atrás</p>
 
-                                <% if(currentUser && currentUser.username == comment.author.username){ %>
-                                <a href="/campgrounds/<%=campground._id%>/comments/<%= comment._id %>/edit" class=""><i
-                                        class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
-                                <form
-                                    action="/campgrounds/<%=campground._id%>/comments/<%= comment._id %>?_method=DELETE"
-                                    method="POST">
-                                    <button href="" class="btn btn-block btn-outline-danger mb-2"><i
-                                            class="fas fa-eraser"></i></button>
-                                </form>
-                                <% } %>
+                            <div class="row comentario" id="">
+                                <div class="col-8 col-lg-10">
+                                    <p class="card-title mr-auto"><%= comment.author.username %></p>
+                                    <p class="card-text text-justify">
+                                        <%= comment.text %>
+                                    </p>
+
+                                </div>
+                                <div class="col-4 col-lg-2">
+                                    <p class="card-title">10 dias atrás</p>
+
+                                    <% if(currentUser && currentUser.username == comment.author.username){ %>
+                                    <a class="botao_editar"><i
+                                            class="fas fa-pen m-0 btn btn-block btn-outline-info mb-2"></i></a>
+                                    <form
+                                        action="/campgrounds/<%=campground._id%>/comments/<%= comment._id %>?_method=DELETE"
+                                        method="POST">
+                                        <button href="" class="btn btn-block btn-outline-danger mb-2"><i
+                                                class="fas fa-eraser"></i></button>
+                                    </form>
+                                    <% } %>
 
 
+                                </div>
                             </div>
                         </div>
 
@@ -100,9 +142,31 @@
         </div>
 
     </div>
-</div>
+</main>
 
+<script>
+// Conta referente a qtd de comentarios do usuario e nao de todos
 
+let botoes = document.getElementsByClassName("botao_editar");
+let botoes_cancel = document.getElementsByClassName("botoes_cancel");
+
+Array.from(botoes).forEach(botao => {
+    botao.addEventListener('click', function () {
+        const comentarioDiv = botao.parentNode.parentNode;
+        comentarioDiv.classList.toggle("d-none");
+        comentarioDiv.parentNode.firstElementChild.classList.toggle("d-none");
+    });
+});
+
+// for diferente pq a qtd de botoes editar
+for (let botao_cancel of botoes_cancel) {
+    botao_cancel.addEventListener('click', function () {
+        const comentarioDiv = botao_cancel.parentNode.parentNode.parentNode.parentNode.parentNode;
+        comentarioDiv.lastElementChild.classList.toggle("d-none");
+        comentarioDiv.firstElementChild.classList.toggle("d-none");
+    });
+}
+</script>
 
 
 <% include ../partials/footer %>

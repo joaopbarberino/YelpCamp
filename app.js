@@ -4,8 +4,9 @@ const express = require("express"),
 	bodyParser = require("body-parser"),
 	mongoose = require("mongoose"),
 	passport = require("passport"),
-	LocalStrategy = require("passport-local");
-	methodOverride = require("method-override");
+	LocalStrategy = require("passport-local"),
+	methodOverride = require("method-override"),
+	flash = require("connect-flash");
 
 // Importa as models utilizadas no projeto
 const Camp = require("./models/campground"),
@@ -27,6 +28,8 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 // Permite criar novos tipos de rotas, como update, delete, etc
 app.use(methodOverride("_method"));
+//
+app.use(flash());
 
 
 // Configuração Passport
@@ -41,11 +44,15 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Passar os dados do usuário para todas as rotas
+// Passar os dados do usuário e das flash-messages para todas as rotas
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
+	res.locals.success = req.flash("success");
+	res.locals.error = req.flash("error");
+	res.locals.denied = req.flash("denied");
 	next();
 });
+
 
 // ------------------------------------------------- Routes -----------------------------------------------------
 app.use("/", indexRoutes);

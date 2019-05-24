@@ -1,6 +1,7 @@
 const express = require("express"),
 	router = express.Router(),
-	passport = require("passport");
+	passport = require("passport"),
+	middleware = require("../middleware");
 
 // Importa as models utilizadas no projeto
 const User = require("../models/user");
@@ -23,10 +24,12 @@ router.post("/register", (req, res) => {
 	let newUser = new User({ username: req.body.username });
 	User.register(newUser, req.body.password, (err, user) => {
 		if (err) {
+			req.flash("error", "Não foi possível registrar o usuário!");
 			console.log(`ERRO AO REGISTRAR USUÁRIO: ${err}`);
-			return res.render("register");
+			res.redirect("/register");
 		}
 		passport.authenticate("local")(req, res, () => {
+			req.flash("success", `Registro concluído com sucesso! Bem-vindo(a), ${req.user.username} !`);
 			console.log(`USUÁRIO REGISTRADO: ${user}`)
 			res.redirect("/campgrounds");
 		})
@@ -35,7 +38,7 @@ router.post("/register", (req, res) => {
 
 // Mostrar form de acesso (login)
 router.get("/login", (req, res) => {
-	res.render("login")
+	res.render("login");
 });
 
 // Lógica de acesso de usuário (login)
@@ -44,9 +47,11 @@ router.post("/login", passport.authenticate("local",
 		successRedirect: "/campgrounds",
 		failureRedirect: "/login"
 	}), (req, res) => {
-		if(err){
-			console.log(err)
+		if (err) {
+			req.flash("error", "Não foi possível entrar!");
+			console.log(`ERRO AO LOGAR: ${err}`)
 		} else {
+			req.flash("success", "Bem-vindo");
 			res.redirect("/campgrounds");
 		}
 	});
@@ -58,25 +63,10 @@ router.get("/warning", (req, res) => {
 
 
 // Lógica de encerramento de sessão (logout)
-router.get("/logout", (req, res) => {
+router.get("/logout", middleware.isLogged, (req, res) => {
+	req.flash("success", `Até mais, ${req.user.username}!`);
 	req.logout();
 	res.redirect("/campgrounds");
 });
-
-function isLogged(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-	res.redirect("/warning");
-}
-
-function isntLogged(req, res, next) {
-    if (req.isAuthenticated()) {
-		console.log("ACHOU USUARIO");
-		return res.redirect("/warning");
-	}
-	console.log("NAO ACHOU USUARIO");
-	return next();
-}
 
 module.exports = router;

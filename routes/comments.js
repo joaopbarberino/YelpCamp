@@ -13,6 +13,7 @@ const Camp = require("../models/campground"),
 router.get("/new", middlewares.isLogged, (req, res) => {
     Camp.findById(req.params.id, (err, campground) => {
         if (err) {
+            req.flash("error", "Não foi possível encontrar o acampamento solicitado!");
             console.log(`ERRO AO ENCONTRAR ACAMPAMENTO: ${err}`);
         } else {
             res.render("comments/new", { campground: campground });
@@ -25,6 +26,7 @@ router.get("/new", middlewares.isLogged, (req, res) => {
 router.post("/", middlewares.isLogged, (req, res) => {
     Camp.findById(req.params.id, (err, campground) => {
         if (err) {
+            req.flash("error", "Acampamento não encontrado!");
             console.log(`ERRO AO ENCONTRAR ACAMPAMENTO: ${err}`);
         } else {
             Comment.create({
@@ -32,6 +34,7 @@ router.post("/", middlewares.isLogged, (req, res) => {
                 text: req.body.comment.text
             }, (err, comment) => {
                 if (err) {
+                    req.flash("error", "Erro ao criar comentário!");
                     console.log(`ERRO AO CRIAR COMENTÁRIO ${err}`);
                 } else {
                     comment.author.id = req.user._id;
@@ -39,6 +42,7 @@ router.post("/", middlewares.isLogged, (req, res) => {
                     comment.save();
                     campground.comments.push(comment);
                     campground.save();
+                    req.flash("success", "Comentário criado com sucesso!");
                     res.redirect(`/campgrounds/${req.params.id}`);
                 };
             });
@@ -50,6 +54,7 @@ router.post("/", middlewares.isLogged, (req, res) => {
 router.get("/:comment_id/edit", middlewares.isTheCommentOwner, (req, res) => {
     Comment.findById(req.params.comment_id, (err, foundComment) => {
         if (err) {
+            req.flash("error", "Não será possível editar o comentário!");
             console.log(`ERRO AO EXIBIR EDIÇÃO DE COMENTÁRIO: ${err}`);
             res.redirect("back");
         } else {
@@ -62,9 +67,11 @@ router.get("/:comment_id/edit", middlewares.isTheCommentOwner, (req, res) => {
 router.put("/:comment_id", middlewares.isTheCommentOwner, (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
         if (err) {
+            req.flash("error", "Não foi possível editar o comentário!");
             console.log(`ERRO AO EDITAR COMENTÁRIO: ${err}`);
             res.redirect("back");
         } else {
+            req.flash("success", "Comentário editado com sucesso!");
             res.redirect("/campgrounds/" + req.params.id);
         }
     });
@@ -73,10 +80,12 @@ router.put("/:comment_id", middlewares.isTheCommentOwner, (req, res) => {
 // Destroy Route
 router.delete("/:comment_id", middlewares.isTheCommentOwner, (req, res) => {
     Comment.findByIdAndRemove(req.params.comment_id, (err) => {
-        if(err){
+        if (err) {
+            req.flash("error", "Não foi possível deletar o comentário!");
             console.log(`ERRO AO DELETAR COMENTÁRIO: ${err}`);
             res.redirect("back");
         } else {
+            req.flash("success", "Comentário deletado com sucesso!");
             res.redirect("back");
         }
     });

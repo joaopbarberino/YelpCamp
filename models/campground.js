@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 
 // Cria um esquema para definir um objeto acampamento no banco de dados
 const campSchema = new mongoose.Schema({
-	name: String,
+    name: String,
 	imgURL: String,
     description: String,
+    price: String,
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,

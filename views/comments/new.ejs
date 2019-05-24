@@ -2,7 +2,7 @@
 
 <div class="container d-flex justify-content-center">
 	<form action="/campgrounds/<%= campground._id %>/comments" method="POST" class="mt-5 w-50">
-		<h1 class="mb-5">Adicionar Novo Comentário ao acampamento <%= campground.name %> </h1>
+		<h3 class="mb-5 text-center">Adicionar novo comentário ao acampamento <%= campground.name %> </h1>
 		<div class="form-group row">
 			<div class="col-md-10">
 				<input readonly hidden class="form-control-plaintext" type="text" name="comment[author]" value="<%= currentUser %>">

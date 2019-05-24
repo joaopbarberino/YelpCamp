@@ -15,6 +15,7 @@ router.get("/", (req, res) => {
     Camp.find({}, (err, camps) => {
         // Verifica se houve erro
         if (err) {
+            req.flash("denied", "Não foi possível encontrar os acampamentos!");
             console.log("ERRO AO COLETAR CAMPS!")
             console.log(err);
             // Se não houve erro, renderiza a página de campgrounds com os dados coletados
@@ -38,21 +39,21 @@ router.post("/", middlewares.isLogged, (req, res) => {
     let name = req.body.name,
         imgURL = req.body.image,
         desc = req.body.desc,
+        price = req.body.price,
         author = {
             id: req.user._id,
             username: req.user.username
         }
-    newCampground = { name: name, imgURL: imgURL, description: desc, author: author };
+    newCampground = { name: name, imgURL: imgURL, description: desc, price: price, author: author };
     // Cria um objeto no banco de dados com os dados recebidos
     Camp.create(newCampground, (err, camp) => {
         // Verifica se houve erro
         if (err) {
-            console.log("ERRO AO SALVAR CAMP!");
-            console.log(err);
+            req.flash("error", "Erro ao criar acampamento!");
+            console.log(`ERRO AO SALVAR CAMP: ${err}`);
             // Se não houve erro, redireciona o usuário a página de campgrounds
         } else {
-            console.log("Camp adicionado.");
-            console.log(camp);
+            req.flash("success", "Acampamento criado com sucesso!");
             res.redirect("/campgrounds")
         }
     });
@@ -63,14 +64,16 @@ router.post("/", middlewares.isLogged, (req, res) => {
 router.get("/:id", (req, res) => {
     Camp.findById(req.params.id).populate("comments").exec((err, campEscolhido) => {
         // Verifica se houve erro
-        //if (err) {
-            //console.log(`ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO: ${err}`);
+        if (err) {
+            req.flash("error", "Não foi possível exibir o acampamento escolhido!");
+            console.log(`ERRO NA EXIBIÇÃO DO CAMP ESCOLHIDO: ${err}`);
+            res.redirect("/campgrounds")
            
             // Se não houve erro, renderiza a página de exibição do camp escolhido
-        //} else {
+        } else {
             // Renderiza a página de informações do camp selecionado
             res.render("campgrounds/show", { campground: campEscolhido });
-        //}
+        }
     });
 });
 
@@ -85,8 +88,10 @@ router.get("/:id/edit", middlewares.isTheCampOwner, (req, res) => {
 router.put("/:id", middlewares.isTheCampOwner, (req, res) => {
     Camp.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCamp) => {
         if (err) {
-            res.redirect("/campgrounds");
+            req.flash("error", "Não foi possível editar o acampamento!");
+            res.redirect("/campgrounds/" + req.params.id);
         } else {
+            req.flash("success", "Acampamento editado com sucesso!");
             res.redirect("/campgrounds/" + req.params.id);
         }
     });
@@ -96,14 +101,17 @@ router.put("/:id", middlewares.isTheCampOwner, (req, res) => {
 router.delete("/:id", middlewares.isTheCampOwner, (req, res) => {
     Camp.findByIdAndRemove(req.params.id, (err, campgroundRemoved) => {
         if (err) {
+            req.flash("error", "Não foi possível deletar o acampamento!");
             console.log(`ERRO AO DELETAR CAMP ${err}`);
             res.redirect("/campgrounds");
         } else {
             Comment.deleteMany({ _id: { $in: campgroundRemoved.comments } }, (err) => {
                 if (err) {
+                    req.flash("error", "Não foi possível deletar os comentários do acampamento deletado!");
                     console.log(`ERRO AO DELETAR COMENTARIO DE CAMPO DELETADO: ${err}`);
                     res.redirect("/campgrounds");
                 } else {
+                    req.flash("success", "Acampamento e comentários deletados com sucesso!");
                     res.redirect("/campgrounds");
                 }
             });

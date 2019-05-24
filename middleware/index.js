@@ -7,7 +7,8 @@ middlewares.isLogged = function (req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect("/warning");
+    req.flash("error", "Você precisa entrar para fazer isso!");
+    res.redirect("/login");
 }
 
 middlewares.isTheCommentOwner = function (req, res, next) {
@@ -16,6 +17,7 @@ middlewares.isTheCommentOwner = function (req, res, next) {
         // Procura o comentario desejado no db
         Comment.findById(req.params.comment_id, (err, foundComment) => {
             if (err) {
+                req.flash("error", "Comentário não encontrado!");
                 console.log(`ERRO AO ENCONTRAR COMENTÁRIO APÓS CONFIRMAR MIDDLEWARE DE IDENTIDADE: ${err}`);
                 res.redirect("back");
                 // Se não tiver erro, confirma se o usuario logado é o dono do coment
@@ -25,12 +27,14 @@ middlewares.isTheCommentOwner = function (req, res, next) {
                     next();
                     // Se não, redireciona à página de aviso
                 } else {
-                    res.redirect("/warning");
+                    req.flash("denied", "Você não tem permissão para fazer isso!");
+                    res.redirect("back");
                 }
             }
         });
     } else {
-        res.redirect("/warning");
+        req.flash("error", "Você precisa entrar para fazer isso!");
+        res.redirect("/login");
     }
 }
 
@@ -40,8 +44,9 @@ middlewares.isTheCampOwner = function (req, res, next) {
         // Procira o camp desejado no db
         Camp.findById(req.params.id, (err, foundCampground) => {
             if (err) {
+                req.flash("error", "Acampamento não encontrado!")
                 console.log(`ERRO AO ENCONTRAR CAMP APÓS CONFIRMAR MIDDLEWARE DE IDENTIDADE ${err}`);
-                res.redirect("back");
+                res.redirect("/backgrounds");
                 // Se não tiver erro, confirma se o usuario logado é o dono do camp
             } else {
                 // Se for, continua
@@ -49,12 +54,14 @@ middlewares.isTheCampOwner = function (req, res, next) {
                     next();
                     // Se não, redireciona à página de aviso
                 } else {
-                    res.redirect("/warning");
+                    req.flash("denied", "Você não tem permissão para fazer isso!");
+                    res.redirect("/campgrounds");
                 }
             }
         });
     } else {
-        res.redirect("/warning");
+        req.flash("error", "Você precisa entrar para fazer isso!");
+        res.redirect("/login");
     }
 }
 
